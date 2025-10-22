@@ -1,0 +1,79 @@
+// Prisma schema for Hosting Expiry Tracker
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 사용자 역할
+enum UserRole {
+  ADMIN    // 에이전시 관리자
+  CLIENT   // 클라이언트
+}
+
+// 호스팅 상태
+enum HostingStatus {
+  ACTIVE      // 활성
+  EXPIRING    // 만료 임박 (30일 이내)
+  EXPIRED     // 만료됨
+  SUSPENDED   // 정지됨
+}
+
+// 사용자 모델
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  password      String
+  name          String
+  role          UserRole @default(CLIENT)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // 관계: 클라이언트가 소유한 사이트들
+  sites         Site[]
+
+  @@map("users")
+}
+
+// 사이트 모델
+model Site {
+  id            String   @id @default(cuid())
+  name          String   // 사이트명
+  domain        String   @unique // 도메인
+  description   String?  // 설명
+  clientId      String   // 클라이언트 ID
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // 관계
+  client        User     @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  hostingInfo   HostingInfo[]
+
+  @@map("sites")
+}
+
+// 호스팅 정보 모델
+model HostingInfo {
+  id              String        @id @default(cuid())
+  siteId          String        // 사이트 ID
+  provider        String        // 호스팅 제공사 (예: AWS, Cafe24, 가비아 등)
+  plan            String        // 플랜명
+  monthlyCost     Float         // 월 비용
+  yearlyTotal     Float?        // 연 총액
+  startDate       DateTime      // 시작일
+  expiryDate      DateTime      // 만료일
+  status          HostingStatus @default(ACTIVE)
+  autoRenewal     Boolean       @default(false) // 자동갱신 여부
+  notes           String?       // 메모
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // 관계
+  site            Site          @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@map("hosting_info")
+}
