@@ -2,6 +2,11 @@
 
 웹 에이전시를 위한 호스팅 관리 및 클라이언트 포털 시스템입니다.
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/hyunjun880/alphadesignlab)
+
+> **⚡ 빠른 시작**: [QUICKSTART.md](./QUICKSTART.md) - 5분 안에 시작하기
+> **🚀 배포 가이드**: [DEPLOYMENT.md](./DEPLOYMENT.md) - Vercel 배포 상세 가이드
+
 ## 주요 기능
 
 ### 관리자 기능
@@ -123,7 +128,34 @@ npm run dev
 ### 사용자
 - `GET /api/users` - 사용자 목록 조회 (관리자 전용)
 
-## 프로덕션 배포
+## Vercel 배포 (권장)
+
+### 빠른 배포
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/hyunjun880/alphadesignlab)
+
+### 수동 배포
+
+1. **PostgreSQL 데이터베이스 준비** (Neon 권장)
+   - [Neon](https://neon.tech) 무료 플랜으로 데이터베이스 생성
+   - 연결 문자열 복사
+
+2. **Vercel에 배포**
+   - [Vercel](https://vercel.com)에서 GitHub 저장소 연동
+   - 환경 변수 설정:
+     - `DATABASE_URL`: PostgreSQL 연결 문자열
+     - `NEXTAUTH_SECRET`: `openssl rand -base64 32`로 생성
+     - `NEXTAUTH_URL`: Vercel 배포 URL
+
+3. **데이터베이스 마이그레이션**
+   ```bash
+   DATABASE_URL="your-production-db-url" npx prisma migrate deploy
+   npm run db:seed
+   ```
+
+**📖 상세 가이드**: [DEPLOYMENT.md](./DEPLOYMENT.md) 참조
+
+## 프로덕션 배포 (기타)
 
 ### 1. 빌드
 
